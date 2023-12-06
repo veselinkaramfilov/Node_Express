@@ -8,10 +8,34 @@ const app = express();
 
 app.use(express.json());
 
-app.post('/users', (req, res) => {
-    User.create(req.body).then(() => { 
-        res.send('User is created');
-    })
+app.post('/users', async (req, res) => {
+    await User.create(req.body); 
+        res.send('User has been created');
+})
+
+app.get('/users', async (req, res) => {
+    const users = await User.findAll();
+    res.send(users);
+})
+
+app.get('/users/:id', async (req, res) => {
+    const searchedId = req.params.id;
+    const user = await User.findOne({where: {id: searchedId}});
+    res.send(user);
+})
+
+app.put('/users/:id', async (req, res) => {
+    const searchedId = req.params.id;
+    const user = await User.findOne({where: {id: searchedId}});
+    user.username = req.body.username;
+    await user.save();
+    res.send('Entry has been updated');
+})
+
+app.delete('/users/:id', async (req, res) => {
+    const searchedId = req.params.id;
+    await User.destroy({ where: { id: searchedId}})
+    res.send('Entry has been deleted');
 })
 
 app.listen(3000, () => {
